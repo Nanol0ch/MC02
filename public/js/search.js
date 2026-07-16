@@ -1,467 +1,295 @@
 $(document).ready(function() {
 
-    // Read URL Parameters
-    var urlParams = new URLSearchParams(window.location.search);
-    var originParam = urlParams.get("origin");
-    var destParam = urlParams.get("destination");
-    var dateParam = urlParams.get("date");
-    var returnParam = urlParams.get("returnDate");
-
-    if (returnParam != "" && returnParam != null) {
-        $("#returnDate").val(returnParam);
-        $("#returnDateSection").show();
-    }
-
-    var tripType = urlParams.get("tripType");
-
-    if (tripType == "oneway") {
-        $("#returnDateSection").hide();
-        $("#oneWayBtn").css("background-color", "#0d6efd");
-        $("#oneWayBtn").css("color", "white");
-        $("#oneWayBtn").css("border-color", "#0d6efd");
-        $("#roundTripBtn").css("background-color", "transparent");
-        $("#roundTripBtn").css("color", "#0d6efd");
-        $("#roundTripBtn").css("border-color", "#0d6efd");
-    }
-
-    if (tripType == "round") {
-        $("#roundTripBtn").css("background-color", "#0d6efd");
-        $("#roundTripBtn").css("color", "white");
-        $("#roundTripBtn").css("border-color", "#0d6efd");
-        $("#oneWayBtn").css("background-color", "transparent");
-        $("#oneWayBtn").css("color", "#0d6efd");
-        $("#oneWayBtn").css("border-color", "#0d6efd");
-    }
-
-    if (originParam) {
-        var originCode = originParam.match(/\(([^)]+)\)/);
-        if (originCode) {
-            $("#origin").val(originCode[1]);
-        }
-    }
-
-    if (destParam) {
-        var destCode = destParam.match(/\(([^)]+)\)/);
-        if (destCode) {
-            $("#destination").val(destCode[1]);
-        }
-    }
-
-    if (dateParam) {
-        $("#departureDate").val(dateParam);
-    }
-
-    // Trip Type Toggle
-    $("#oneWayBtn").click(function() {
-        $("#returnDateSection").hide();
-        $("#oneWayBtn").css("background-color", "#0d6efd");
-        $("#oneWayBtn").css("color", "white");
-        $("#oneWayBtn").css("border-color", "#0d6efd");
-        $("#roundTripBtn").css("background-color", "transparent");
-        $("#roundTripBtn").css("color", "#0d6efd");
-        $("#roundTripBtn").css("border-color", "#0d6efd");
+    $('#oneWayBtn').click(function() {
+        $('#returnDateSection').hide();
+        $('#oneWayBtn').removeClass('btn-outline-primary').addClass('btn-primary');
+        $('#roundTripBtn').removeClass('btn-primary').addClass('btn-outline-primary');
     });
 
-    $("#roundTripBtn").click(function() {
-        $("#returnDateSection").show();
-        $("#roundTripBtn").css("background-color", "#0d6efd");
-        $("#roundTripBtn").css("color", "white");
-        $("#roundTripBtn").css("border-color", "#0d6efd");
-        $("#oneWayBtn").css("background-color", "transparent");
-        $("#oneWayBtn").css("color", "#0d6efd");
-        $("#oneWayBtn").css("border-color", "#0d6efd");
+    $('#roundTripBtn').click(function() {
+        $('#returnDateSection').show();
+        $('#roundTripBtn').removeClass('btn-outline-primary').addClass('btn-primary');
+        $('#oneWayBtn').removeClass('btn-primary').addClass('btn-outline-primary');
     });
 
-    // Passenger Counters
-    $("#adultPlus").click(function() {
-        var count = parseInt($("#adultCount").text());
-        $("#adultCount").text(count + 1);
+    $('#adultPlus').click(function() {
+        let count = parseInt($('#adultCount').text());
+        $('#adultCount').text(count + 1);
     });
 
-    $("#adultMinus").click(function() {
-        var count = parseInt($("#adultCount").text());
-        if (count > 1) {
-            $("#adultCount").text(count - 1);
-        }
+    $('#adultMinus').click(function() {
+        let count = parseInt($('#adultCount').text());
+        if (count > 1) $('#adultCount').text(count - 1);
     });
 
-    $("#childPlus").click(function() {
-        var count = parseInt($("#childCount").text());
-        $("#childCount").text(count + 1);
+    $('#childPlus').click(function() {
+        let count = parseInt($('#childCount').text());
+        $('#childCount').text(count + 1);
     });
 
-    $("#childMinus").click(function() {
-        var count = parseInt($("#childCount").text());
-        if (count > 0) {
-            $("#childCount").text(count - 1);
-        }
+    $('#childMinus').click(function() {
+        let count = parseInt($('#childCount').text());
+        if (count > 0) $('#childCount').text(count - 1);
     });
 
-    $("#infantPlus").click(function() {
-        var count = parseInt($("#infantCount").text());
-        $("#infantCount").text(count + 1);
+    $('#infantPlus').click(function() {
+        let count = parseInt($('#infantCount').text());
+        $('#infantCount').text(count + 1);
     });
 
-    $("#infantMinus").click(function() {
-        var count = parseInt($("#infantCount").text());
-        if (count > 0) {
-            $("#infantCount").text(count - 1);
-        }
+    $('#infantMinus').click(function() {
+        let count = parseInt($('#infantCount').text());
+        if (count > 0) $('#infantCount').text(count - 1);
     });
 
-    // Price Slider
-    $("#priceSlider").on("input", function() {
-        var value = $(this).val();
-        $("#priceSliderValue").text(value);
+    $('#priceSlider').on('input', function() {
+        $('#priceSliderValue').text(parseInt($(this).val()).toLocaleString());
+        applyFilters();
     });
 
-    // Form Validation and Search Button — AJAX Call
-    var allFlights = [];
+    let allFlights = [];
 
-    $("#searchBtn").click(function() {
+    $('#searchBtn').click(function() {
 
-        var origin = $("#origin").val();
-        var destination = $("#destination").val();
-        var departureDate = $("#departureDate").val();
-        var valid = true;
+        const origin = $('#origin').val();
+        const destination = $('#destination').val();
+        const date = $('#departureDate').val();
 
-        if (origin == "") {
-            $("#originError").show();
+        let valid = true;
+
+        if (!origin) {
+            $('#originError').removeClass('d-none');
             valid = false;
         } else {
-            $("#originError").hide();
+            $('#originError').addClass('d-none');
         }
 
-        if (destination == "") {
-            $("#destinationError").show();
+        if (!destination) {
+            $('#destinationError').removeClass('d-none');
             valid = false;
         } else {
-            $("#destinationError").hide();
+            $('#destinationError').addClass('d-none');
         }
 
-        if (origin == destination && origin != "") {
-            $("#sameRouteError").show();
+        if (origin && destination && origin === destination) {
+            $('#sameRouteError').removeClass('d-none');
             valid = false;
         } else {
-            $("#sameRouteError").hide();
+            $('#sameRouteError').addClass('d-none');
         }
 
-        if (departureDate == "") {
-            $("#departureDateError").show();
+        if (!date) {
+            $('#departureDateError').removeClass('d-none');
             valid = false;
         } else {
-            $("#departureDateError").hide();
+            $('#departureDateError').addClass('d-none');
         }
 
-        var returnDate = $("#returnDate").val();
-        var isRoundTrip = $("#returnDateSection").is(":visible");
+        if (!valid) return;
 
-        if (isRoundTrip && returnDate == "") {
-            $("#returnDateError").show();
-            valid = false;
-        } else if (isRoundTrip && returnDate <= departureDate) {
-            $("#returnDateError").show();
-            valid = false;
-        } else {
-            $("#returnDateError").hide();
-        }
+        $('#searchSpinner').removeClass('d-none');
+        $('#searchBtnText').text('Searching...');
 
-        if (valid == true) {
-            $("#searchSpinner").removeClass("d-none");
-            $("#searchBtnText").text("Searching...");
-            $("#searchBtn").prop("disabled", true);
+        const toastEl = document.getElementById('searchToast');
+        const toast = new bootstrap.Toast(toastEl);
+        $('#searchToast').addClass('bg-primary');
+        $('#toastMessage').text('Searching for flights...');
+        toast.show();
 
-            $.ajax({
-                url: "/flights/search",
-                method: "GET",
-                data: {
-                    origin: origin,
-                    destination: destination,
-                    date: departureDate
-                },
-                success: function(flights) {
-                    allFlights = flights;
+        $.ajax({
+            url: '/flights/search',
+            method: 'GET',
+            data: { origin, destination, date },
+            success: function(flights) {
+                allFlights = flights;
+                applyFilters();
+                $('#resultsSection').show();
+                $('#resultsCount').text(flights.length);
+                $('#searchSpinner').addClass('d-none');
+                $('#searchBtnText').text('Search Flights');
+                $('#searchToast').removeClass('bg-primary').addClass('bg-success');
+                $('#toastMessage').text('Flights loaded successfully!');
+                toast.show();
+            },
+            error: function() {
+                $('#searchSpinner').addClass('d-none');
+                $('#searchBtnText').text('Search Flights');
+                $('#searchToast').removeClass('bg-primary').addClass('bg-danger');
+                $('#toastMessage').text('Something went wrong. Please try again.');
+                toast.show();
+            }
+        });
 
-                    $("#searchSpinner").addClass("d-none");
-                    $("#searchBtnText").text("Search Flights");
-                    $("#searchBtn").prop("disabled", false);
-                    $("#resultsSection").show();
-
-                    var preferred = $("#preferredAirline").val();
-                    var filtered = allFlights.slice();
-
-                    if (preferred != "") {
-                        filtered = filtered.filter(function(f) {
-                            return f.airline == preferred;
-                        });
-                    }
-
-                    var directOnly = $("#directOnly").is(":checked");
-                    if (directOnly) {
-                        filtered = filtered.filter(function(f) {
-                            return f.stops == 0;
-                        });
-                    }
-
-                    renderFlights(filtered);
-
-                    var toast = new bootstrap.Toast(document.getElementById("searchToast"));
-                    $("#toastMessage").text("Flights loaded successfully!");
-                    $("#searchToast").addClass("bg-success");
-                    toast.show();
-                },
-                error: function() {
-                    $("#searchSpinner").addClass("d-none");
-                    $("#searchBtnText").text("Search Flights");
-                    $("#searchBtn").prop("disabled", false);
-
-                    var toast = new bootstrap.Toast(document.getElementById("searchToast"));
-                    $("#toastMessage").text("Something went wrong. Please try again.");
-                    $("#searchToast").addClass("bg-danger");
-                    toast.show();
-                }
-            });
-        }
     });
 
-    // Sort Flights
-    $("#sortSelect").change(function() {
+    function renderFlights(flights) {
+        $('#flightResults').empty();
 
-        var sortBy = $("#sortSelect").val();
+        if (flights.length === 0) {
+            $('#noResults').show();
+            return;
+        }
 
-        if (sortBy == "price") {
-            allFlights.sort(function(a, b) {
-                return a.price - b.price;
+        $('#noResults').hide();
+
+        flights.forEach(function(flight) {
+            const card = `
+                <div class="card mb-3 p-3 shadow-sm">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <strong>${flight.airline}</strong><br>
+                            <small>${flight.flightNumber}</small>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>${new Date(flight.departure).toLocaleString()}</strong><br>
+                            <small>${flight.origin} → ${flight.destination}</small>
+                        </div>
+                        <div class="col-md-2">
+                            <small>Arrives</small><br>
+                            <strong>${new Date(flight.arrival).toLocaleString()}</strong>
+                        </div>
+                        <div class="col-md-2">
+                            <small>Seats left</small><br>
+                            <strong>${flight.seats}</strong>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>₱${flight.price.toLocaleString()}</strong>
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <button class="btn btn-sm btn-outline-primary mb-1 view-details-btn"
+                                data-id="${flight._id}"> View Details </button>
+                            <a href="/bookings/${flight._id}"
+                                class="btn btn-sm btn-primary"> Book </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#flightResults').append(card);
+        });
+    }
+
+    function applyFilters() {
+        let filtered = [...allFlights];
+
+        const selectedAirlines = $('.filter-airline:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (selectedAirlines.length > 0) {
+            filtered = filtered.filter(function(f) {
+                return selectedAirlines.includes(f.airline);
             });
         }
 
-        if (sortBy == "departure") {
-            allFlights.sort(function(a, b) {
+        const selectedPrices = $('.filter-price:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (selectedPrices.length > 0) {
+            filtered = filtered.filter(function(f) {
+                return selectedPrices.some(function(range) {
+                    const [min, max] = range.split('-').map(Number);
+                    return f.price >= min && f.price <= max;
+                });
+            });
+        }
+
+        const selectedStops = $('.filter-stops:checked').map(function() {
+            return parseInt($(this).val());
+        }).get();
+
+        if (selectedStops.length > 0) {
+            filtered = filtered.filter(function(f) {
+                return selectedStops.includes(f.stops);
+            });
+        }
+
+        const selectedSchedule = $('.filter-schedule:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (selectedSchedule.length > 0) {
+            filtered = filtered.filter(function(f) {
+                const hour = new Date(f.departure).getHours();
+                return selectedSchedule.some(function(s) {
+                    if (s === 'morning') return hour >= 5 && hour < 12;
+                    if (s === 'afternoon') return hour >= 12 && hour < 18;
+                    if (s === 'evening') return hour >= 18 && hour < 24;
+                    if (s === 'night') return hour >= 0 && hour < 5;
+                });
+            });
+        }
+
+        const preferredAirline = $('#preferredAirline').val();
+        if (preferredAirline) {
+            filtered = filtered.filter(function(f) {
+                return f.airline === preferredAirline;
+            });
+        }
+
+        const maxPrice = parseInt($('#priceSlider').val());
+        filtered = filtered.filter(function(f) {
+            return f.price <= maxPrice;
+        });
+
+        if ($('#directOnly').is(':checked')) {
+            filtered = filtered.filter(function(f) {
+                return f.stops === 0;
+            });
+        }
+
+        const sortBy = $('#sortSelect').val();
+        if (sortBy === 'price') {
+            filtered.sort(function(a, b) { return a.price - b.price; });
+        } else if (sortBy === 'departure') {
+            filtered.sort(function(a, b) {
                 return new Date(a.departure) - new Date(b.departure);
             });
+        } else if (sortBy === 'duration') {
+            filtered.sort(function(a, b) { return a.durationMins - b.durationMins; });
         }
 
-        if (sortBy == "duration") {
-            allFlights.sort(function(a, b) {
-                return a.durationMins - b.durationMins;
-            });
-        }
-
-        renderFlights(allFlights);
-
-    });
-
-    // Filter Flights
-    function applyFilters() {
-
-        var filtered = [];
-
-        for (var i = 0; i < allFlights.length; i++) {
-
-            var flight = allFlights[i];
-            var show = true;
-
-            // Price Filter
-            var selectedPrices = [];
-            $(".filter-price:checked").each(function() {
-                selectedPrices.push($(this).val());
-            });
-
-            if (selectedPrices.length > 0) {
-                var inPrice = false;
-                for (var j = 0; j < selectedPrices.length; j++) {
-                    var range = selectedPrices[j].split("-");
-                    if (flight.price >= parseInt(range[0]) && flight.price <= parseInt(range[1])) {
-                        inPrice = true;
-                    }
-                }
-                if (inPrice == false) {
-                    show = false;
-                }
-            }
-
-            // Schedule Filter
-            var selectedSchedules = [];
-            $(".filter-schedule:checked").each(function() {
-                selectedSchedules.push($(this).val());
-            });
-
-            if (selectedSchedules.length > 0) {
-                var inSchedule = false;
-                var hour = new Date(flight.departure).getHours();
-
-                for (var m = 0; m < selectedSchedules.length; m++) {
-                    if (selectedSchedules[m] == "morning" && hour >= 5 && hour < 12) {
-                        inSchedule = true;
-                    }
-                    if (selectedSchedules[m] == "afternoon" && hour >= 12 && hour < 18) {
-                        inSchedule = true;
-                    }
-                    if (selectedSchedules[m] == "evening" && hour >= 18 && hour < 24) {
-                        inSchedule = true;
-                    }
-                    if (selectedSchedules[m] == "night" && hour >= 0 && hour < 5) {
-                        inSchedule = true;
-                    }
-                }
-
-                if (inSchedule == false) {
-                    show = false;
-                }
-            }
-
-            // Airline Filter
-            var selectedAirlines = [];
-            $(".filter-airline:checked").each(function() {
-                selectedAirlines.push($(this).val());
-            });
-
-            if (selectedAirlines.length > 0) {
-                var inAirline = false;
-                for (var n = 0; n < selectedAirlines.length; n++) {
-                    if (flight.airline == selectedAirlines[n]) {
-                        inAirline = true;
-                    }
-                }
-                if (inAirline == false) {
-                    show = false;
-                }
-            }
-
-            // Stops Filter
-            var selectedStops = [];
-            $(".filter-stops:checked").each(function() {
-                selectedStops.push(parseInt($(this).val()));
-            });
-
-            if (selectedStops.length > 0) {
-                var inStops = false;
-                for (var k = 0; k < selectedStops.length; k++) {
-                    if (flight.stops == selectedStops[k]) {
-                        inStops = true;
-                    }
-                }
-                if (inStops == false) {
-                    show = false;
-                }
-            }
-
-            // Preferred Airline (Advanced Search)
-            var preferred = $("#preferredAirline").val();
-            if (preferred != "") {
-                if (flight.airline != preferred) {
-                    show = false;
-                }
-            }
-
-            // Direct Only (Advanced Search)
-            var directOnly = $("#directOnly").is(":checked");
-            if (directOnly && flight.stops != 0) {
-                show = false;
-            }
-
-            if (show == true) {
-                filtered.push(flight);
-            }
-
-        }
-
+        $('#resultsCount').text(filtered.length);
         renderFlights(filtered);
-
     }
 
-    $(document).on("change", ".filter-price, .filter-stops, .filter-schedule, .filter-airline", function() {
+    $('#sortSelect').change(function() {
         applyFilters();
     });
 
-    // Advanced Search Dynamic Filter
-    $("#preferredAirline, #directOnly").change(function() {
+    $('.filter-airline, .filter-price, .filter-stops, .filter-schedule').change(function() {
         applyFilters();
     });
 
-    // View Details Modal
-    $("#flightResults").on("click", ".viewDetailsBtn", function() {
-
-        var id = $(this).data("id");
-        var flight;
-
-        for (var i = 0; i < allFlights.length; i++) {
-            if (allFlights[i]._id == id) {
-                flight = allFlights[i];
-            }
-        }
-
-        var details = "<p><b> Airline: </b>" + flight.airline + "</p>" +
-            "<p><b> Flight Number: </b>" + flight.flightNumber + "</p>" +
-            "<p><b> Origin: </b>" + flight.origin + "</p>" +
-            "<p><b> Destination: </b>" + flight.destination + "</p>" +
-            "<p><b> Departure: </b>" + new Date(flight.departure).toLocaleString() + "</p>" +
-            "<p><b> Arrival: </b>" + new Date(flight.arrival).toLocaleString() + "</p>" +
-            "<p><b> Stops: </b>" + flight.stops + "</p>" +
-            "<p><b> Price: </b> ₱" + flight.price + "</p>" +
-            "<p><b> Seats Available: </b>" + flight.seats + "</p>";
-
-        $("#modalBody").html(details);
-
-        $("#flightDetailsModal .btn-primary").attr("href", "/flight-details?flightId=" + flight._id);
-
-        var modal = new bootstrap.Modal(document.getElementById("flightDetailsModal"));
-        modal.show();
-
+    $('#clearFiltersBtn, #resetFiltersBtn').click(function() {
+        $('.filter-airline, .filter-price, .filter-stops, .filter-schedule').prop('checked', false);
+        $('#preferredAirline').val('');
+        $('#priceSlider').val(50000);
+        $('#priceSliderValue').text('50,000');
+        $('#directOnly').prop('checked', false);
+        applyFilters();
     });
 
-    // Clear Filters
-    $("#clearFiltersBtn, #resetFiltersBtn").click(function() {
-        $(".filter-price, .filter-stops, .filter-schedule, .filter-airline").prop("checked", false);
-        renderFlights(allFlights);
+    $(document).on('click', '.view-details-btn', function() {
+        const id = $(this).data('id');
+        const flight = allFlights.find(function(f) { return f._id === id; });
+
+        if (!flight) return;
+
+        $('#modalBody').html(`
+            <p><strong>Flight Number:</strong> ${flight.flightNumber}</p>
+            <p><strong>Airline:</strong> ${flight.airline}</p>
+            <p><strong>Origin:</strong> ${flight.origin}</p>
+            <p><strong>Destination:</strong> ${flight.destination}</p>
+            <p><strong>Departure:</strong> ${new Date(flight.departure).toLocaleString()}</p>
+            <p><strong>Arrival:</strong> ${new Date(flight.arrival).toLocaleString()}</p>
+            <p><strong>Seats Available:</strong> ${flight.seats}</p>
+            <p><strong>Price:</strong> ₱${flight.price.toLocaleString()}</p>
+        `);
+
+        $('#flightDetailsModal .btn-primary').attr('href', '/flight-details?flightId=' + flight._id);
+
+        new bootstrap.Modal(document.getElementById('flightDetailsModal')).show();
     });
 
 });
-
-// Render Flight Cards
-function renderFlights(flightList) {
-
-    $("#flightResults").html("");
-    $("#resultsCount").text(flightList.length);
-
-    if (flightList.length == 0) {
-        $("#noResults").show();
-        return;
-    } else {
-        $("#noResults").hide();
-    }
-
-    for (var i = 0; i < flightList.length; i++) {
-
-        var flight = flightList[i];
-
-        var card = "<div class='card mb-3'>" +
-            "<div class='card-body'>" +
-            "<div class='d-flex align-items-center mb-2'>" +
-            "<img src='" + getAirlineLogo(flight.airline) + "' style='width:40px; height:40px; object-fit:contain; margin-right:10px;'>" +
-            "<h5 class='mb-0'><span class='badge bg-primary'>" + flight.airline + "</span> " + flight.flightNumber + "</h5>" +
-            "</div>" +
-            "<p>" + flight.origin + " → " + flight.destination + "</p>" +
-            "<p> Departure: " + new Date(flight.departure).toLocaleString() + " | Arrival: " + new Date(flight.arrival).toLocaleString() + "</p>" +
-            "<p> Stops: " + flight.stops + "</p>" +
-            "<p> Price: ₱" + flight.price + " | Seats: " + flight.seats + "</p>" +
-            "<button class='btn btn-primary viewDetailsBtn' data-id='" + flight._id + "'> View Details </button>" +
-            "<a href='/bookings?flightId=" + flight._id + "' class='btn btn-outline-primary'> Book </a>" +
-            "</div>" +
-            "</div>";
-
-        $("#flightResults").append(card);
-
-    }
-
-}
-
-// Airline Logo Helper
-function getAirlineLogo(airline) {
-    if (airline == "Philippine Airlines") return "img/pal.png";
-    if (airline == "Cebu Pacific") return "img/cebupacific.png";
-    if (airline == "AirAsia") return "img/airasia.png";
-    if (airline == "Qatar Airways") return "img/qatar.png";
-    if (airline == "Emirates") return "img/emirates.png";
-    return "img/default.png";
-}

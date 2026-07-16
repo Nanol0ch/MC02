@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const adminController = require('../controllers/adminController');
+const reservationController = require('../controllers/reservationController');
 
-router.get('/', adminController.getDashboard);
-router.get('/users', adminController.getUsersPage);
+router.get('/', reservationController.getMyReservations);
+router.patch('/:id/seat', reservationController.updateSeat);
+router.delete('/:id', reservationController.cancelReservation);
 
 router.get('/flights', adminController.getFlights);
 router.post('/flights', adminController.createFlight);

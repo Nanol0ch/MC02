@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Flight = require('./models/Flight');
+const Flight = require('./models/flight');
 const db = require('./db');
 
 const flights = [

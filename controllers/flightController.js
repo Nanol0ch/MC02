@@ -1,17 +1,19 @@
 const Flight = require('../models/flight');
 
+const getSearchPage = (req, res) => {
+    res.render('search');
+};
+
 const searchFlights = async (req, res) => {
     try {
         const { origin, destination, date } = req.query;
 
-        // Server-side validation
         if (!origin || !destination || !date) {
             return res.status(400).json({ 
                 error: 'Origin, destination, and date are required.' 
             });
         }
 
-        // Build the search query
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
 
@@ -52,4 +54,4 @@ const getFlightById = async (req, res) => {
     }
 };
 
-module.exports = { searchFlights, getFlightById };
+module.exports = { getSearchPage, searchFlights, getFlightById };

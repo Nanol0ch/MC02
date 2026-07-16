@@ -219,21 +219,6 @@ $(document).ready(function () {
 
   
   // 4. DYNAMIC SEAT MAP (AJAX) (MCO2)
-  
-  // Read flight data from the hidden inputs we placed in booking.hbs
-  let flightId = $('#hiddenFlightId').val();
-  let BASE_FARE = parseInt($('#hiddenBaseFare').val()) || 0;
-  let FLIGHT_SEATS_AVAILABLE = parseInt($('#hiddenAvailableSeats').val()) || 0;
-  const TAXES = 680;
-
-  // Set the initial Base Fare and Taxes in the UI
-  $('#costBase').text('₱' + BASE_FARE.toLocaleString());
-  $('#costTax').text('₱' + TAXES.toLocaleString());
-
-  // Tracking variables
-  let selectedSeats = []; 
-  let premiumSeatCount = 0; 
-  let seatsRequired = 1; // Simplified for this task scope
 
   function generateSeatMap() {
     const rows = 6;
@@ -287,7 +272,7 @@ $(document).ready(function () {
   // Call it immediately on page load
   generateSeatMap();
 
-  
+
   
   // 5. SEAT SELECTION LOGIC (WITH AJAX RUBRIC CHECK) (MCO2)
 

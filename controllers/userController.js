@@ -92,6 +92,21 @@ exports.logoutUser = (req, res) => {
     });
 };
 
+// GET /
+exports.getHomePage = async (req, res) => {
+    try {
+        const Flight = require('../models/flight');
+        const Reservation = require('../models/reservation');
+        const flightCount = await Flight.countDocuments();
+        const bookingCount = await Reservation.countDocuments();
+        const flights = await Flight.find().lean();
+        res.render('home_dashboard', { flightCount, bookingCount, flights });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+};
+
 // GET /profile
 exports.getProfile = async (req, res) => {
     try {

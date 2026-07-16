@@ -42,7 +42,7 @@ const bookingController = {
             const flight = await Flight.findById(flightId);
 
             // Business Rules Validation[cite: 18]
-            if (flight.availableSeats <= 0) {
+            if (flight.seats <= 0) {
                 return res.status(400).json({ error: "Flight is fully booked." });
             }
 
@@ -67,7 +67,7 @@ const bookingController = {
             await newReservation.save();
 
             // Decrement seats[cite: 18]
-            flight.availableSeats -= 1;
+            flight.seats -= 1;
             await flight.save();
 
             res.status(200).json({ message: "Booking successful!", reference: bookingRef });

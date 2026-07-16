@@ -1,1 +1,31 @@
+const express = require('express');
+const exphbs = require('express-handlebars');
+const session = require('express-session');
+const db = require('./db');
 
+const app = express();
+
+db.connect();
+
+app.engine('hbs', exphbs.engine({ extname: 'hbs', defaultLayout: 'main' }));
+app.set('view engine', 'hbs');
+app.set('views', './views');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(session({
+    secret: 'airroute',
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use('/', require('./routes/auth'));
+app.use('/flights', require('./routes/flights'));
+app.use('/bookings', require('./routes/bookings'));
+app.use('/reservations', require('./routes/reservations'));
+app.use('/admin', require('./routes/admin'));
+
+app.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+});

@@ -33,11 +33,11 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/', require('./routes/auth'));
-app.use('/flights', require('./routes/flights'));
-app.use('/bookings', require('./routes/bookings'));
-app.use('/reservations', require('./routes/reservations'));
-app.use('/admin', require('./routes/admin'));
+app.use('/', require('./routes/authRoutes'));
+app.use('/flights', require('./routes/flightRoutes'));
+app.use('/bookings', require('./routes/bookingRoutes'));
+app.use('/reservations', require('./routes/reservationRoutes'));
+app.use('/admin', require('./routes/adminRoutes'));
 
 app.listen(3000, () => {
     console.log('Server running on http://localhost:3000');

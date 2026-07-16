@@ -7,7 +7,15 @@ const app = express();
 
 db.connect();
 
-app.engine('hbs', exphbs.engine({ extname: 'hbs', defaultLayout: 'main' }));
+app.engine('hbs', exphbs.engine({
+    extname: 'hbs',
+    defaultLayout: 'main',
+    helpers: {
+        json: function(context) {
+            return JSON.stringify(context);
+        }
+    }
+}));
 app.set('view engine', 'hbs');
 app.set('views', './views');
 

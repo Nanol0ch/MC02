@@ -1,6 +1,8 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const session = require('express-session');
+const authRoutes = require('./routes/auth');
+app.use('/', authRoutes);
 const db = require('./db');
 
 const app = express();

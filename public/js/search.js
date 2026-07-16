@@ -97,7 +97,7 @@ $(document).ready(function() {
         toast.show();
 
         $.ajax({
-            url: '/flights/search',
+            url: '/flights/search/results',
             method: 'GET',
             data: { origin, destination, date },
             success: function(flights) {
@@ -262,34 +262,4 @@ $(document).ready(function() {
     });
 
     $('#clearFiltersBtn, #resetFiltersBtn').click(function() {
-        $('.filter-airline, .filter-price, .filter-stops, .filter-schedule').prop('checked', false);
-        $('#preferredAirline').val('');
-        $('#priceSlider').val(50000);
-        $('#priceSliderValue').text('50,000');
-        $('#directOnly').prop('checked', false);
-        applyFilters();
-    });
-
-    $(document).on('click', '.view-details-btn', function() {
-        const id = $(this).data('id');
-        const flight = allFlights.find(function(f) { return f._id === id; });
-
-        if (!flight) return;
-
-        $('#modalBody').html(`
-            <p><strong>Flight Number:</strong> ${flight.flightNumber}</p>
-            <p><strong>Airline:</strong> ${flight.airline}</p>
-            <p><strong>Origin:</strong> ${flight.origin}</p>
-            <p><strong>Destination:</strong> ${flight.destination}</p>
-            <p><strong>Departure:</strong> ${new Date(flight.departure).toLocaleString()}</p>
-            <p><strong>Arrival:</strong> ${new Date(flight.arrival).toLocaleString()}</p>
-            <p><strong>Seats Available:</strong> ${flight.seats}</p>
-            <p><strong>Price:</strong> ₱${flight.price.toLocaleString()}</p>
-        `);
-
-        $('#flightDetailsModal .btn-primary').attr('href', '/flight-details?flightId=' + flight._id);
-
-        new bootstrap.Modal(document.getElementById('flightDetailsModal')).show();
-    });
-
-});
+        $('.filter-airline, .filter-price, .filter-stops, .filter-schedule').prop('checked',
